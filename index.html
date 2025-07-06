@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>N은/는 N이에요/예요 문법 퀴즈</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            max-width: 700px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .title {
+            font-size: 2.5em;
+            color: #333;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 1.1em;
+            margin-bottom: 30px;
+        }
+
+        .grammar-rule {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 8px;
+            text-align: left;
+        }
+
+        .quiz-container {
+            margin-top: 30px;
+        }
+
+        .question {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 25px;
+            margin: 20px 0;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s ease;
+        }
+
+        .question:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .question-text {
+            font-size: 1.4em;
+            color: #333;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+
+        .options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .option {
+            background: #fff;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.1em;
+        }
+
+        .option:hover {
+            border-color: #667eea;
+            transform: scale(1.02);
+        }
+
+        .option.selected {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .option.correct {
+            background: #28a745;
+            color: white;
+            border-color: #28a745;
+        }
+
+        .option.incorrect {
+            background: #dc3545;
+            color: white;
+            border-color: #dc3545;
+        }
+
+        .feedback {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            display: none;
+        }
+
+        .feedback.correct {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .feedback.incorrect {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .score {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #333;
+            margin: 20px 0;
+            padding: 20px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 12px;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .progress-bar {
+            background: #e9ecef;
+            border-radius: 10px;
+            height: 8px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            height: 100%;
+            transition: width 0.3s ease;
+            border-radius: 10px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .blank {
+            color: #667eea;
+            font-weight: bold;
+            text-decoration: underline;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+            
+            .title {
+                font-size: 2em;
+            }
+            
+            .options {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">N은/는 N이에요/예요</h1>
+        <p class="subtitle">문법 연습 퀴즈</p>
+        
+        <div class="grammar-rule">
+            <strong>📝 语法规则 (문법 규칙):</strong><br>
+            • 主语：有收音的名词后面 + <strong>은</strong> / 没有收音的名词后面 + <strong>는</strong><br>
+            • 谓语：有收音的名词后面 + <strong>이에요</strong> / 没有收音的名词后面 + <strong>예요</strong><br>
+            <em>주어: 받침이 있는 명사 뒤 + 은 / 받침이 없는 명사 뒤 + 는<br>
+            술어: 받침이 있는 명사 뒤 + 이에요 / 받침이 없는 명사 뒤 + 예요</em>
+        </div>
+
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+
+        <div class="quiz-container" id="quizContainer">
+            <!-- 퀴즈 문제들이 여기에 동적으로 생성됩니다 -->
+        </div>
+
+        <div class="score hidden" id="scoreContainer">
+            <div id="finalScore"></div>
+            <button class="btn" onclick="restartQuiz()">重新开始</button>
+        </div>
+
+        <div style="margin-top: 30px;">
+            <button class="btn" id="checkBtn" onclick="checkAnswer()" disabled>检查答案</button>
+            <button class="btn" id="nextBtn" onclick="nextQuestion()" disabled>下一题</button>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                question: "저<span class='blank'>____</span> 학생<span class='blank'>____</span>.",
+                options: ["는 / 이에요", "은 / 이에요", "는 / 예요", "은 / 예요"],
+                answer: "는 / 이에요",
+                explanation: "저(没有收音) + 는, 학생(有收音 ㄴ) + 이에요"
+            },
+            {
+                question: "마리아<span class='blank'>____</span> 의사<span class='blank'>____</span>.",
+                options: ["는 / 이에요", "은 / 이에요", "는 / 예요", "은 / 예요"],
+                answer: "는 / 예요",
+                explanation: "마리아(没有收音) + 는, 의사(没有收音) + 예요"
+            },
+            {
+                question: "김 선생님<span class='blank'>____</span> 한국 사람<span class='blank'>____</span>.",
+                options: ["는 / 이에요", "은 / 이에요", "는 / 예요", "은 / 예요"],
+                answer: "은 / 이에요",
+                explanation: "선생님(有收音 ㅁ) + 은, 사람(有收音 ㅁ) + 이에요"
+            },
+            {
+                question: "제 친구<span class='blank'>____</span> 요리사<span class='blank'>____</span>.",
+                options: ["는 / 이에요", "은 / 이에요", "는 / 예요", "은 / 예요"],
+                answer: "는 / 예요",
+                explanation: "친구(没有收音) + 는, 요리사(没有收音) + 예요"
+            },
+            {
+                question: "아버지<span class='blank'>____</span> 회사원<span class='blank'>____</span>.",
+                options: ["는 / 이에요", "은 / 이에요", "는 / 예요", "은 / 예요"],
+                answer: "는 / 이에요",
+                explanation: "아버지(没有收音) + 는, 회사원(有收音 ㄴ) + 이에요"
+            },
+            {
+                question: "언니<span class='blank'>____</span> 기자<span class='blank'>____</span>.",
+                options: ["는 / 이에요", "은 / 이에요", "는 / 예요", "은 / 예요"],
+                answer: "는 / 예요",
+                explanation: "언니(没有收音) + 는, 기자(没有收音) + 예요"
+            },
+            {
+                question: "톰<span class='blank'>____</span> 미국 사람<span class='blank'>____</span>.",
+                options: ["는 / 이에요", "은 / 이에요", "는 / 예요", "은 / 예요"],
+                answer: "은 / 이에요",
+                explanation: "톰(有收音 ㅁ) + 은, 사람(有收音 ㅁ) + 이에요"
+            },
+            {
+                question: "엄마<span class='blank'>____</span> 주부<span class='blank'>____</span>.",
+                options: ["는 / 이에요", "은 / 이에요", "는 / 예요", "은 / 예요"],
+                answer: "는 / 예요",
+                explanation: "엄마(没有收音) + 는, 주부(没有收음) + 예요"
+            },
+            {
+                question: "이 사람<span class='blank'>____</span> 가수<span class='blank'>____</span>.",
+                options: ["는 / 이에요", "은 / 이에요", "는 / 예요", "은 / 예요"],
+                answer: "은 / 예요",
+                explanation: "사람(有收音 ㅁ) + 은, 가수(没有收音) + 예요"
+            },
+            {
+                question: "저희 형<span class='blank'>____</span> 군인<span class='blank'>____</span>.",
+                options: ["는 / 이에요", "은 / 이에요", "는 / 예요", "은 / 예요"],
+                answer: "은 / 이에요",
+                explanation: "형(有收音 ㅇ) + 은, 군인(有收音 ㄴ) + 이에요"
+            }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let selectedAnswer = null;
+        let answered = false;
+
+        function startQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            selectedAnswer = null;
+            answered = false;
+            document.getElementById('scoreContainer').classList.add('hidden');
+            document.getElementById('quizContainer').classList.remove('hidden');
+            showQuestion();
+        }
+
+        function showQuestion() {
+            const question = questions[currentQuestion];
+            const quizContainer = document.getElementById('quizContainer');
+            
+            let optionsHTML = '';
+            question.options.forEach(option => {
+                optionsHTML += `<div class="option" onclick="selectAnswer('${option}')">${option}</div>`;
+            });
+            
+            quizContainer.innerHTML = `
+                <div class="question">
+                    <div class="question-text">${currentQuestion + 1}. ${question.question}</div>
+                    <div class="options">
+                        ${optionsHTML}
+                    </div>
+                    <div class="feedback" id="feedback"></div>
+                </div>
+            `;
+
+            updateProgress();
+            updateButtons();
+        }
+
+        function selectAnswer(answer) {
+            if (answered) return;
+            
+            selectedAnswer = answer;
+            
+            // 모든 옵션의 selected 클래스 제거
+            document.querySelectorAll('.option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            
+            // 선택된 옵션에 selected 클래스 추가
+            event.target.classList.add('selected');
+            
+            updateButtons();
+        }
+
+        function checkAnswer() {
+            if (!selectedAnswer || answered) return;
+            
+            answered = true;
+            const question = questions[currentQuestion];
+            const feedback = document.getElementById('feedback');
+            const options = document.querySelectorAll('.option');
+            
+            options.forEach(option => {
+                if (option.textContent === question.answer) {
+                    option.classList.add('correct');
+                } else if (option.textContent === selectedAnswer && selectedAnswer !== question.answer) {
+                    option.classList.add('incorrect');
+                }
+            });
+            
+            if (selectedAnswer === question.answer) {
+                score++;
+                feedback.className = 'feedback correct';
+                feedback.textContent = `正确！${question.explanation}`;
+            } else {
+                feedback.className = 'feedback incorrect';
+                feedback.textContent = `错误。正确答案是 "${question.answer}"。${question.explanation}`;
+            }
+            
+            feedback.style.display = 'block';
+            updateButtons();
+        }
+
+        function nextQuestion() {
+            if (!answered) return;
+            
+            currentQuestion++;
+            selectedAnswer = null;
+            answered = false;
+            
+            if (currentQuestion < questions.length) {
+                showQuestion();
+            } else {
+                showFinalScore();
+            }
+        }
+
+        function showFinalScore() {
+            document.getElementById('quizContainer').classList.add('hidden');
+            document.getElementById('scoreContainer').classList.remove('hidden');
+            
+            const percentage = Math.round((score / questions.length) * 100);
+            let message = '';
+            
+            if (percentage >= 90) {
+                message = '🎉 완벽해요! 문법을 정확히 이해하고 계시네요!';
+            } else if (percentage >= 70) {
+                message = '👍 잘했어요! 조금만 더 연습하면 완벽할 거예요!';
+            } else if (percentage >= 50) {
+                message = '💪 괜찮아요! 더 연습해서 실력을 향상시켜보세요!';
+            } else {
+                message = '📚 문법 규칙을 다시 한 번 확인하고 연습해보세요!';
+            }
+            
+            document.getElementById('finalScore').innerHTML = `
+                <div style="font-size: 2em; margin-bottom: 20px;">最终得分</div>
+                <div style="font-size: 3em; margin-bottom: 20px;">${score}/${questions.length}</div>
+                <div style="font-size: 1.5em; margin-bottom: 20px;">${percentage}%</div>
+                <div style="font-size: 1.2em;">${message}</div>
+            `;
+            
+            updateProgress();
+        }
+
+        function updateProgress() {
+            const progress = ((currentQuestion + (answered ? 1 : 0)) / questions.length) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+        }
+
+        function updateButtons() {
+            const checkBtn = document.getElementById('checkBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            
+            checkBtn.disabled = !selectedAnswer || answered;
+            nextBtn.disabled = !answered;
+        }
+
+        function restartQuiz() {
+            startQuiz();
+        }
+
+        // 키보드 이벤트
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') {
+                if (!answered && selectedAnswer) {
+                    checkAnswer();
+                } else if (answered) {
+                    nextQuestion();
+                }
+            }
+        });
+
+        // 퀴즈 시작
+        startQuiz();
+    </script>
+</body>
+</html>
