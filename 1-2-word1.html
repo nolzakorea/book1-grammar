@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>서울대한국어1권 2과 단어 플래시카드</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 24rem;
+        }
+
+        .start-screen {
+            background: white;
+            border-radius: 1.5rem;
+            padding: 2rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            text-align: center;
+        }
+
+        .start-emoji {
+            font-size: 3.75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .start-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+        }
+
+        .start-subtitle {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #6b7280;
+            margin-bottom: 1.5rem;
+        }
+
+        .start-description {
+            color: #6b7280;
+            margin-bottom: 2rem;
+        }
+
+        .start-button {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            color: white;
+            font-weight: 600;
+            border: none;
+            border-radius: 9999px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .start-button:hover {
+            background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+            transform: translateY(-1px);
+        }
+
+        .progress-container {
+            margin-bottom: 1.5rem;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .progress-text {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.875rem;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 0.5rem;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 9999px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: white;
+            border-radius: 9999px;
+            transition: width 0.3s ease;
+        }
+
+        .card-container {
+            position: relative;
+            perspective: 1000px;
+            margin-bottom: 1.5rem;
+        }
+
+        .card {
+            position: relative;
+            width: 100%;
+            height: 20rem;
+            cursor: pointer;
+            transition: all 0.7s ease;
+            transform-style: preserve-3d;
+        }
+
+        .card.flipped {
+            transform: rotateX(180deg);
+        }
+
+        .card.animating {
+            transform: scale(0.95);
+            opacity: 0;
+        }
+
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: white;
+            border-radius: 1.5rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+        }
+
+        .card-back {
+            transform: rotateX(180deg);
+        }
+
+        .card-content {
+            text-align: center;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .korean-word {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #1f2937;
+            margin-bottom: 1rem;
+        }
+
+        .korean-example {
+            color: #6b7280;
+            font-size: 0.875rem;
+            line-height: 1.6;
+        }
+
+        .chinese-emoji {
+            font-size: 3.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .chinese-word {
+            font-size: 1.875rem;
+            font-weight: bold;
+            color: #1f2937;
+        }
+
+        .flip-instruction {
+            color: #9ca3af;
+            font-size: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .navigation {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+
+        .nav-button {
+            padding: 0.75rem;
+            border-radius: 9999px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .nav-button:hover:not(:disabled) {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .nav-button:disabled {
+            background: rgba(255, 255, 255, 0.2);
+            color: rgba(255, 255, 255, 0.5);
+            cursor: not-allowed;
+        }
+
+        .back-button {
+            text-align: center;
+        }
+
+        .back-link {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: color 0.3s ease;
+        }
+
+        .back-link:hover {
+            color: white;
+            text-decoration: underline;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .icon {
+            width: 1.25rem;
+            height: 1.25rem;
+            fill: currentColor;
+        }
+
+        @media (max-width: 640px) {
+            .container {
+                max-width: 20rem;
+            }
+            
+            .card {
+                height: 18rem;
+            }
+            
+            .korean-word {
+                font-size: 2rem;
+            }
+            
+            .chinese-emoji {
+                font-size: 3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Start Screen -->
+        <div id="startScreen" class="start-screen">
+            <div class="start-emoji">📚</div>
+            <h1 class="start-title">서울대한국어1권</h1>
+            <h2 class="start-subtitle">2과 단어</h2>
+            <p class="start-description">총 <span id="totalCards">54</span>개의 단어를 학습하세요</p>
+            <button class="start-button" onclick="startStudy()">학습 시작하기</button>
+        </div>
+
+        <!-- Study Screen -->
+        <div id="studyScreen" class="hidden">
+            <!-- Progress Bar -->
+            <div class="progress-container">
+                <div class="progress-header">
+                    <span class="progress-text">진도</span>
+                    <span class="progress-text"><span id="currentCard">1</span> / <span id="totalCardsStudy">54</span></span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+            </div>
+
+            <!-- Card -->
+            <div class="card-container">
+                <div class="card" id="flashcard" onclick="flipCard()">
+                    <!-- Front of card - Korean -->
+                    <div class="card-face card-front">
+                        <div class="card-content">
+                            <h2 class="korean-word" id="koreanWord"></h2>
+                            <p class="korean-example" id="koreanExample"></p>
+                        </div>
+                        <p class="flip-instruction">카드를 터치하여 뒤집기</p>
+                    </div>
+                    
+                    <!-- Back of card - Chinese -->
+                    <div class="card-face card-back">
+                        <div class="card-content">
+                            <div class="chinese-emoji" id="chineseEmoji"></div>
+                            <h2 class="chinese-word" id="chineseWord"></h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation -->
+            <div class="navigation">
+                <button class="nav-button" id="prevButton" onclick="previousCard()">
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="m15 18-6-6 6-6"/>
+                    </svg>
+                </button>
+                
+                <button class="nav-button" onclick="flipCard()">
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+                        <path d="M3 3v5h5"/>
+                    </svg>
+                </button>
+                
+                <button class="nav-button" id="nextButton" onclick="nextCard()">
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="m9 18 6-6-6-6"/>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Back to Start -->
+            <div class="back-button">
+                <a href="#" class="back-link" onclick="backToStart()">처음으로 돌아가기</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const flashcards = [
+            { korean: "책상", example: "책상 위에 책이 있어요.", chinese: "书桌", emoji: "🪑" },
+            { korean: "의자", example: "의자에 앉아 주세요.", chinese: "椅子", emoji: "🪑" },
+            { korean: "책", example: "한국어 책을 읽어요.", chinese: "书", emoji: "📚" },
+            { korean: "공책", example: "공책에 한국어를 써요.", chinese: "笔记本", emoji: "📓" },
+            { korean: "볼펜", example: "볼펜으로 이름을 써요.", chinese: "圆珠笔", emoji: "🖊️" },
+            { korean: "연필", example: "연필로 그림을 그려요.", chinese: "铅笔", emoji: "✏️" },
+            { korean: "가방", example: "가방에 책을 넣어요.", chinese: "包", emoji: "🎒" },
+            { korean: "지우개", example: "지우개로 글자를 지워요.", chinese: "橡皮", emoji: "🧽" },
+            { korean: "시계", example: "시계를 봐요. 몇 시예요?", chinese: "手表", emoji: "⌚" },
+            { korean: "모자", example: "모자를 써요.", chinese: "帽子", emoji: "🧢" },
+            { korean: "우산", example: "비가 와요. 우산을 가져가세요.", chinese: "伞", emoji: "☂️" },
+            { korean: "신문", example: "아침에 신문을 읽어요.", chinese: "报纸", emoji: "📰" },
+            { korean: "카메라", example: "카메라로 사진을 찍어요.", chinese: "相机", emoji: "📷" },
+            { korean: "사전", example: "사전에서 단어를 찾아요.", chinese: "词典", emoji: "📖" },
+            { korean: "안경", example: "안경을 써요.", chinese: "眼镜", emoji: "👓" },
+            { korean: "휴대폰", example: "휴대폰으로 전화해요.", chinese: "手机", emoji: "📱" },
+            { korean: "동전", example: "동전이 많아요.", chinese: "硬币", emoji: "🪙" },
+            { korean: "지갑", example: "지갑에 돈이 있어요.", chinese: "钱包", emoji: "👛" },
+            { korean: "지도", example: "지도를 봐요.", chinese: "地图", emoji: "🗺️" },
+            { korean: "전자사전", example: "전자사전을 사용해요.", chinese: "电子词典", emoji: "💻" },
+            { korean: "자", example: "자로 길이를 재요.", chinese: "尺子", emoji: "📏" },
+            { korean: "필통", example: "필통에 펜을 넣어요.", chinese: "笔盒", emoji: "🧰" },
+            { korean: "잡지", example: "잡지를 읽어요.", chinese: "杂志", emoji: "📖" },
+            { korean: "차", example: "차를 마셔요.", chinese: "茶", emoji: "🍵" },
+            { korean: "커피", example: "커피를 마셔요.", chinese: "咖啡", emoji: "☕" },
+            { korean: "콜라", example: "콜라를 마셔요.", chinese: "可乐", emoji: "🥤" },
+            { korean: "주스", example: "주스가 맛있어요.", chinese: "果汁", emoji: "🧃" },
+            { korean: "우유", example: "우유를 마셔요.", chinese: "牛奶", emoji: "🥛" },
+            { korean: "사과", example: "사과를 먹어요.", chinese: "苹果", emoji: "🍎" },
+            { korean: "오렌지", example: "오렌지가 달아요.", chinese: "橙子", emoji: "🍊" },
+            { korean: "바나나", example: "바나나를 먹어요.", chinese: "香蕉", emoji: "🍌" },
+            { korean: "딸기", example: "딸기가 빨갛고 달아요.", chinese: "草莓", emoji: "🍓" },
+            { korean: "물", example: "물을 마셔요.", chinese: "水", emoji: "💧" },
+            { korean: "냉장고", example: "냉장고에 우유가 있어요.", chinese: "冰箱", emoji: "🧊" },
+            { korean: "텔레비전", example: "텔레비전을 봐요.", chinese: "电视", emoji: "📺" },
+            { korean: "침대", example: "침대에서 자요.", chinese: "床", emoji: "🛏️" },
+            { korean: "에어컨", example: "에어컨을 켜요.", chinese: "空调", emoji: "❄️" },
+            { korean: "컴퓨터", example: "컴퓨터로 공부해요.", chinese: "电脑", emoji: "💻" },
+            { korean: "창문", example: "창문을 열어요.", chinese: "窗户", emoji: "🪟" },
+            { korean: "뭐", example: "뭐 해요?", chinese: "什么", emoji: "❓" },
+            { korean: "친구", example: "친구와 만나요.", chinese: "朋友", emoji: "👫" },
+            { korean: "남자 친구", example: "남자 친구가 있어요.", chinese: "男朋友", emoji: "👨‍❤️‍👨" },
+            { korean: "여자 친구", example: "여자 친구와 영화를 봐요.", chinese: "女朋友", emoji: "👩‍❤️‍👩" },
+            { korean: "루동대학교", example: "루동대학교에서 공부해요.", chinese: "鲁东大学", emoji: "🏫" },
+            { korean: "제", example: "제 이름은 김민수예요.", chinese: "我的", emoji: "👤" },
+            { korean: "방", example: "방이 깨끗해요.", chinese: "房间", emoji: "🏠" },
+            { korean: "룸메이트", example: "룸메이트와 같이 살아요.", chinese: "室友", emoji: "👥" },
+            { korean: "우리", example: "우리 집에 와요.", chinese: "我们", emoji: "👨‍👩‍👧‍👦" },
+            { korean: "교통카드", example: "교통카드로 지하철을 타요.", chinese: "交通卡", emoji: "💳" },
+            { korean: "영화", example: "영화를 봐요.", chinese: "电影", emoji: "🎬" },
+            { korean: "휴지", example: "휴지를 주세요.", chinese: "纸巾", emoji: "🧻" },
+            { korean: "좀", example: "물 좀 주세요.", chinese: "稍微", emoji: "🤏" },
+            { korean: "한국어", example: "한국어를 배워요.", chinese: "韩语", emoji: "🇰🇷" },
+            { korean: "한국어로", example: "한국어로 말해요.", chinese: "用韩语", emoji: "🗣️" },
+            { korean: "여기 있어요", example: "책이 여기 있어요.", chinese: "在这里", emoji: "👈" },
+            { korean: "어서 오세요", example: "어서 오세요! 환영합니다.", chinese: "欢迎光临", emoji: "👋" }
+        ];
+
+        let currentIndex = 0;
+        let flipped = false;
+        let animating = false;
+
+        function startStudy() {
+            document.getElementById('startScreen').classList.add('hidden');
+            document.getElementById('studyScreen').classList.remove('hidden');
+            updateCard();
+        }
+
+        function backToStart() {
+            document.getElementById('studyScreen').classList.add('hidden');
+            document.getElementById('startScreen').classList.remove('hidden');
+            currentIndex = 0;
+            flipped = false;
+            animating = false;
+        }
+
+        function updateCard() {
+            const card = flashcards[currentIndex];
+            
+            document.getElementById('koreanWord').textContent = card.korean;
+            document.getElementById('koreanExample').textContent = card.example;
+            document.getElementById('chineseWord').textContent = card.chinese;
+            document.getElementById('chineseEmoji').textContent = card.emoji;
+            
+            document.getElementById('currentCard').textContent = currentIndex + 1;
+            document.getElementById('totalCardsStudy').textContent = flashcards.length;
+            
+            const progress = ((currentIndex + 1) / flashcards.length) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+            
+            document.getElementById('prevButton').disabled = currentIndex === 0;
+            document.getElementById('nextButton').disabled = currentIndex === flashcards.length - 1;
+        }
+
+        function flipCard() {
+            if (animating) return;
+            
+            const card = document.getElementById('flashcard');
+            flipped = !flipped;
+            
+            if (flipped) {
+                card.classList.add('flipped');
+            } else {
+                card.classList.remove('flipped');
+            }
+        }
+
+        function nextCard() {
+            if (currentIndex >= flashcards.length - 1 || animating) return;
+            
+            animating = true;
+            const card = document.getElementById('flashcard');
+            
+            card.classList.add('animating');
+            
+            setTimeout(() => {
+                flipped = false;
+                card.classList.remove('flipped');
+                currentIndex++;
+                updateCard();
+                
+                setTimeout(() => {
+                    card.classList.remove('animating');
+                    animating = false;
+                }, 50);
+            }, 150);
+        }
+
+        function previousCard() {
+            if (currentIndex <= 0 || animating) return;
+            
+            animating = true;
+            const card = document.getElementById('flashcard');
+            
+            card.classList.add('animating');
+            
+            setTimeout(() => {
+                flipped = false;
+                card.classList.remove('flipped');
+                currentIndex--;
+                updateCard();
+                
+                setTimeout(() => {
+                    card.classList.remove('animating');
+                    animating = false;
+                }, 50);
+            }, 150);
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            if (document.getElementById('studyScreen').classList.contains('hidden')) return;
+            
+            if (e.key === 'ArrowLeft') {
+                previousCard();
+            } else if (e.key === 'ArrowRight') {
+                nextCard();
+            } else if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+                e.preventDefault();
+                flipCard();
+            }
+        });
+
+        // Initialize
+        document.getElementById('totalCards').textContent = flashcards.length;
+    </script>
+</body>
+</html>
